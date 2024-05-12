@@ -1,5 +1,6 @@
 package tests;
 
+import io.qameta.allure.Step;
 import io.restassured.RestAssured;
 import model.Courier;
 import model.CourierId;
@@ -33,7 +34,7 @@ public class BaseCourierTest {
                 {new Courier(CD_4.getLogin(), DEFAULT_PASSWORD, CD_4.getFirstname())},
         };
     }
-
+    @Step("Creating a courier for testing by POST-request /api/v1/courier")
     public void createCourier(Courier courier) {
         given()
                 .header(HTTP.CONTENT_TYPE, JSON_TYPE)
@@ -41,6 +42,7 @@ public class BaseCourierTest {
                 .post(CREATE_COURIER_METHOD);
     }
 
+    @Step("Getting a courier id for deleting by POST-request /api/v1/courier/login")
     private int getCourierId(Courier courier) {
         return given()
                 .header(HTTP.CONTENT_TYPE, JSON_TYPE)
@@ -49,6 +51,7 @@ public class BaseCourierTest {
                 .body().as(CourierId.class).getId();
     }
 
+    @Step("Send DELETE-request /api/v1/courier/:id to delete courier after tests")
     public void deleteCourier(Courier courier) {
         given().delete(DELETE_COURIER_METHOD + getCourierId(courier));
     }

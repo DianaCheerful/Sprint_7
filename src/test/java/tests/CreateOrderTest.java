@@ -1,5 +1,9 @@
 package tests;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
 import model.Order;
 import org.apache.http.HttpStatus;
 import org.apache.http.protocol.HTTP;
@@ -49,16 +53,33 @@ public class CreateOrderTest extends BaseOrderTest {
 
 
     @Test
+    @DisplayName("Should create an order with different colors data")
+    @Description("Checking one or several colors while creating an order for /api/v1/orders endpoint - POST method")
     public void shouldCreateOrderWithDifferentColorsData() {
+        setColorParameter();
+        Response response = sendPostRequestToCreateOrderWithColorOptions();
+        checkTrackFieldIsNotEmptyAndStatusCode(response);
+    }
+
+    @Step("Set color parameter")
+    private void setColorParameter() {
         order.setColor(color);
-        given()
+    }
+
+
+    @Step("Send POST-request /api/v1/orders with color options")
+    private Response sendPostRequestToCreateOrderWithColorOptions() {
+        return given()
                 .header(HTTP.CONTENT_TYPE, JSON_TYPE)
                 .and()
                 .body(order)
                 .when()
-                .post(ORDERS_METHOD)
-                .then().assertThat().body(TRACK_FIELD, notNullValue())
-                .and()
-                .statusCode(HttpStatus.SC_CREATED);
+                .post(ORDERS_METHOD);
+    }
+
+    @Step("Check Id-field and Status code")
+    private void checkTrackFieldIsNotEmptyAndStatusCode(Response response) {
+        response.then().assertThat().body(TRACK_FIELD, notNullValue())
+                .and().statusCode(HttpStatus.SC_CREATED);
     }
 }
